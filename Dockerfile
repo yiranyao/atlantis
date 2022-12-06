@@ -17,7 +17,7 @@ ENV DEFAULT_TERRAFORM_VERSION=1.3.5
 
 # In the official Atlantis image we only have the latest of each Terraform version.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN AVAILABLE_TERRAFORM_VERSIONS="1.0.11 1.1.9 1.2.9 ${DEFAULT_TERRAFORM_VERSION}" && \
+RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.31 0.13.7 1.0.11 1.1.9 1.2.9 ${DEFAULT_TERRAFORM_VERSION}" && \
     case "${TARGETPLATFORM}" in \
         "linux/amd64") TERRAFORM_ARCH=amd64 ;; \
         "linux/arm64") TERRAFORM_ARCH=arm64 ;; \
@@ -57,6 +57,15 @@ RUN AVAILABLE_CONFTEST_VERSIONS="${DEFAULT_CONFTEST_VERSION}" && \
     done
 
 RUN ln -s /usr/local/bin/cft/versions/${DEFAULT_CONFTEST_VERSION}/conftest /usr/local/bin/conftest
+
+# Download Terragrunt v0.25.3
+RUN TERRAGRUNT_VS=0.25.3 && \
+    curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VS}/terragrunt_linux_amd64 && \
+    curl -LOs https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VS}/SHA256SUMS && \
+    sed -n "/terragrunt_linux_amd64/p" SHA256SUMS | sha256sum -c && \
+    chmod +x terragrunt_linux_amd64 && \
+    mv terragrunt_linux_amd64 /usr/local/bin/terragrunt && \
+    rm SHA256SUMS;
 
 # copy binary
 COPY --from=builder /app/atlantis /usr/local/bin/atlantis
