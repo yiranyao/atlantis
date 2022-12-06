@@ -1,0 +1,31 @@
+schemaVersion: 2.0
+
+package:
+  dockerfile:
+    perApplication: false
+    dockerfilePath: Dockerfile
+
+machine:
+  baseImage: docker.apple.com/pie/fuji:latest
+  env:
+    APP_NAME: "atlantis"
+    DOCKER_BUILDKIT: "1"
+    UPSTREAM_VERSION: "0.21.0"
+
+pipelines:
+- branchName: main
+  trigger:
+        gitPush: true
+  build:
+    template: freestyle:v4:publish
+    steps: ["true"]
+
+  package:
+    version: "next"
+    dockerfile:
+    - version: "latest"
+      env:
+        GRPCURL_VERSION: "1.8.7"
+      extraTags: ["${UPSTREAM_VERSION}-${RIO_BUILD_NUMBER}"]
+      publish:
+      - repo: docker.apple.com/apay-docker/ce/${APP_NAME}
