@@ -48,7 +48,7 @@ jobs:
     # Publish dev image to container registry
     - name: Build and push atlantis:dev image
       if: ${{ contains(fromJson('["push", "pull_request"]'), github.event_name) }}
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: .
         platforms: linux/arm64/v8,linux/amd64,linux/arm/v7
@@ -68,7 +68,7 @@ jobs:
       if: |
         contains(fromJson('["push", "pull_request"]'), github.event_name) &&
         startsWith(github.ref, 'refs/tags/')
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v4
       with:
         context: .
         platforms: linux/arm64/v8,linux/amd64,linux/arm/v7
